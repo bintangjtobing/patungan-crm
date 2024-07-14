@@ -13,13 +13,7 @@ class KredentialCustomer extends Model
         'user_id',
         'product_uuid',
         'email_akses',
-        'profil_akses',
-        'pin',
-    ];
-
-    protected $hidden = [
-        'email_akses',
-        'profil_akses',
+        'profil_akes',
         'pin',
     ];
 }

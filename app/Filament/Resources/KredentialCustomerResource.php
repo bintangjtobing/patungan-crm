@@ -19,7 +19,9 @@ class KredentialCustomerResource extends Resource
 {
     protected static ?string $model = KredentialCustomer::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'System management';
+    protected static ?int $navigationSort = 2;
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
     {
@@ -50,11 +52,15 @@ class KredentialCustomerResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('user.name')->label('User')
+                    ->searchable(),
+                    Tables\Columns\TextColumn::make('product.nama')->label('Product name')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('email_akses')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('pin')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('profil_akes')
+                Tables\Columns\TextColumn::make('profil_akes')->label('Profil Akses')
                     ->searchable(),
             ])
             ->filters([

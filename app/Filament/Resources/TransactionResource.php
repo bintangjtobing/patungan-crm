@@ -26,7 +26,9 @@ class TransactionResource extends Resource
 {
     protected static ?string $model = Transaction::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Transaction';
+    protected static ?int $navigationSort = 1;
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
     {
@@ -64,11 +66,6 @@ class TransactionResource extends Resource
                             $set('user_id', auth()->id());
                         }
                     }),
-                // ->disabled(function ($get) {
-                //     return $get('jenis_transaksi') == 0; // Disable jika jenis_transaksi adalah Pembelian (0)
-                // }),
-
-
                 Forms\Components\Select::make('product_uuid')
                     ->label('Produk')
                     ->options(Product::all()->pluck('nama', 'uuid'))
@@ -124,6 +121,7 @@ class TransactionResource extends Resource
                         }
                         return null;
                     })
+                    ->numeric()
                     ->extraInputAttributes(['readonly' => true]), // Menambahkan atribut readonly,
 
 
@@ -179,9 +177,12 @@ class TransactionResource extends Resource
                             : '<span style="color: green;">Penjualan</span>';
                     })
                     ->html(),
+                Tables\Columns\TextColumn::make('product.nama')->label('Product'),
                 Tables\Columns\TextColumn::make('jumlah')
+                    ->numeric()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('harga')
+                    ->money('IDR')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')

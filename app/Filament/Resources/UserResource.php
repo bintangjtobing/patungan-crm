@@ -23,8 +23,10 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
+    protected static ?string $navigationGroup = 'Admin Panel';
+    protected static ?int $navigationSort = 1;
+    protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
