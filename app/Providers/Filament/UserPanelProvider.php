@@ -17,47 +17,27 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Filament\Navigation\NavigationGroup;
 use App\Filament\Pages\Registration;
 
-
-class AdminPanelProvider extends PanelProvider
+class UserPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
-            ->id('admin')
-            ->path('admin')
+            ->id('user')
+            ->path('user')
             ->login()
             ->registration(Registration::class)
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->navigationGroups([
-                NavigationGroup::make()
-                    ->label('Admin Panel')
-                    ->icon('heroicon-o-building-storefront'), // Group icon
-                NavigationGroup::make()
-                        ->label('Transaction')
-                        ->icon('heroicon-o-shopping-cart'), // Group icon
-                NavigationGroup::make()
-                            ->label('Finance management')
-                            ->icon('heroicon-o-clipboard-document-list'),  // Group icon
-                NavigationGroup::make()
-                    ->label('System management')
-                    ->icon('heroicon-o-cog'), // Group icon
-            ])
-            ->brandName('PatunganYukIDN - CRM App')
-            ->brandLogo('https://res.cloudinary.com/boxity-id/image/upload/v1720974567/2_copy_z3a91z.png')
-            ->brandLogoHeight('5rem')
-            ->favicon('https://res.cloudinary.com/boxity-id/image/upload/v1720974566/2_rpjs5h.png')
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
+            ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->pages([
                 Pages\Dashboard::class,
+                // App\Filament\Pages\Payments::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/User/Widgets'), for: 'App\\Filament\\User\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
             ])

@@ -54,4 +54,10 @@ class User extends Authenticatable implements HasAvatar
     {
         return $this->profile_picture;
     }
+
+
+    public function isAdmin(): bool
+    {
+        return $this->type === 0;
+    }
 }
