@@ -77,7 +77,7 @@ class SubscriptionResource extends Resource
             'index' => Pages\ListSubscriptions::route('/'),
             'create' => Pages\CreateSubscription::route('/create'),
             'edit' => Pages\EditSubscription::route('/{record}/edit'),
-            'order' => Pages\Order::route('/{record}/order')
+            'order' => Pages\OrderSubscription::route('/{record}/order')
         ];
     }
 }
