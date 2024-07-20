@@ -12,6 +12,11 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\StatusUpdatedNotification;
+use Filament\Tables\Actions\Action;
 
 class SubscriptionResource extends Resource
 {
@@ -31,7 +36,12 @@ class SubscriptionResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $user = Auth::user(); // Get the authenticated user
+        $userId = $user->id; // Assuming 'id' is the user ID field in your user model
         return $table
+            // ->modifyQueryUsing(function (Builder $query) use ($userId) {
+            //     $query->where('user_id', $userId);
+            // })
             ->columns([
                 Tables\Columns\TextColumn::make('nama')
                     ->searchable(),
@@ -42,7 +52,9 @@ class SubscriptionResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Action::make('edit')
+                    ->label('Order')
+                    ->url(fn ($record): string => route('subscriptions.order', $record->uuid))
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -64,6 +76,7 @@ class SubscriptionResource extends Resource
             'index' => Pages\ListSubscriptions::route('/'),
             'create' => Pages\CreateSubscription::route('/create'),
             'edit' => Pages\EditSubscription::route('/{record}/edit'),
+            'order' => Pages\Order::route('/{record}/order')
         ];
     }
 }

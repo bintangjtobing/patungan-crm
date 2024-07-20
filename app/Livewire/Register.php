@@ -23,7 +23,8 @@ class Register extends Component implements HasForms
     {
         return $form->schema([
             TextInput::make('username')
-                ->maxLength(255),
+                ->maxLength(255)
+                ->extraAttributes(['class' => 'border border-gray-300 rounded']), // Add Tailwind classes
             TextInput::make('name')
                 ->required()
                 ->maxLength(255),

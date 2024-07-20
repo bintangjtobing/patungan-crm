@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Product;
+use Illuminate\Support\Carbon;
 
 class Transaction extends Model
 {
@@ -22,6 +23,10 @@ class Transaction extends Model
         'bukti_transaksi',
     ];
 
+    public function getModifiedTransactionDateAttribute()
+    {
+        return Carbon::parse($this->tanggal_waktu_transaksi_selesai)->addMonth()->format('Y-m-d');
+    }
 
     public function product()
     {
