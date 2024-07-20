@@ -9,11 +9,12 @@ use Filament\Resources\Pages\ListRecords;
 class ListTransactions extends ListRecords
 {
     protected static string $resource = TransactionResource::class;
+    protected static ?string $title = 'Transactions History';
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            // Actions\CreateAction::make(),
         ];
     }
 }
