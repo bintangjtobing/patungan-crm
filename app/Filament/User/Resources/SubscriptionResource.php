@@ -46,6 +46,7 @@ class SubscriptionResource extends Resource
                 Tables\Columns\TextColumn::make('nama')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('harga_jual')
+                    ->money('IDR')
                     ->searchable(),
             ])
             ->filters([

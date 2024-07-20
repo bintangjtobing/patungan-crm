@@ -41,7 +41,9 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make('product.nama')
                     ->label('Product'),
                 Tables\Columns\TextColumn::make('product.harga_jual')
-                    ->label('harga'),
+                    ->label('Harga')
+                    ->money('IDR')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('tanggal_waktu_transaksi_selesai')
                     ->label('Tanggal Pesanan')
                     ->searchable(),
@@ -54,9 +56,6 @@ class TransactionResource extends Resource
             ])
             ->filters([
                 //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
