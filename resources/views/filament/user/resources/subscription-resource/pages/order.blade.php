@@ -1,5 +1,3 @@
 <x-filament::page>
-    <!-- Konten halaman order subscription -->
-    <h1>Order Subscription</h1>
-    <p>Record ID: {{ $record }}</p>
+    @livewire('orderSubscription', ['product' => $record])
 </x-filament::page>

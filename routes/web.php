@@ -13,6 +13,3 @@ foreach (config('tenancy.central_domains') as $domain) {
     });
 }
 
-
-Route::get('user/subscriptions/{record}/order', [OrderController::class, 'show'])->name('subscriptions.order');
-
