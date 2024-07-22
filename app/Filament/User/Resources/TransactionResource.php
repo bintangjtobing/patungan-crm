@@ -19,7 +19,9 @@ class TransactionResource extends Resource
 {
     protected static ?string $model = Transaction::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static ?string $navigationLabel = 'Transaction History';
+
 
     public static function form(Form $form): Form
     {
@@ -41,7 +43,9 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make('product.nama')
                     ->label('Product'),
                 Tables\Columns\TextColumn::make('product.harga_jual')
-                    ->label('harga'),
+                    ->label('Harga')
+                    ->money('IDR')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('tanggal_waktu_transaksi_selesai')
                     ->label('Tanggal Pesanan')
                     ->searchable(),
@@ -54,9 +58,6 @@ class TransactionResource extends Resource
             ])
             ->filters([
                 //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([

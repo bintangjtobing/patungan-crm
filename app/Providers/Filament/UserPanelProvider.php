@@ -31,6 +31,10 @@ class UserPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->brandName('PatunganYukIDN - CRM App')
+            ->brandLogo('https://res.cloudinary.com/boxity-id/image/upload/v1720974567/2_copy_z3a91z.png')
+            ->brandLogoHeight('5rem')
+            ->favicon('https://res.cloudinary.com/boxity-id/image/upload/v1720974566/2_rpjs5h.png')
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->pages([

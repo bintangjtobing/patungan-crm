@@ -23,6 +23,18 @@ class Transaction extends Model
         'bukti_transaksi',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Event creating untuk mengatur nilai default tanggal_waktu_transaksi_selesai
+        static::creating(function ($transaction) {
+            if (is_null($transaction->tanggal_waktu_transaksi_selesai)) {
+                $transaction->tanggal_waktu_transaksi_selesai = Carbon::now()->setTimezone('Asia/Jakarta');
+            }
+        });
+    }
+
     public function getModifiedTransactionDateAttribute()
     {
         return Carbon::parse($this->tanggal_waktu_transaksi_selesai)->addMonth()->format('Y-m-d');

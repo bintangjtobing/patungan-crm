@@ -23,6 +23,10 @@ class SubscriptionResource extends Resource
     protected static ?string $model = Product::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $title = 'List available product';
+    protected static ?string $navigationLabel = 'Products';
+    protected static ?string $slug = 'list-available-products';
+
 
     public static function form(Form $form): Form
     {
@@ -46,6 +50,7 @@ class SubscriptionResource extends Resource
                 Tables\Columns\TextColumn::make('nama')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('harga_jual')
+                    ->money('IDR')
                     ->searchable(),
             ])
             ->filters([
@@ -76,7 +81,7 @@ class SubscriptionResource extends Resource
             'index' => Pages\ListSubscriptions::route('/'),
             'create' => Pages\CreateSubscription::route('/create'),
             'edit' => Pages\EditSubscription::route('/{record}/edit'),
-            'order' => Pages\Order::route('/{record}/order')
+            'order' => Pages\OrderSubscription::route('/{record}/order')
         ];
     }
 }
