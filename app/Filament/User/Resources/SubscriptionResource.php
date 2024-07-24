@@ -56,8 +56,7 @@ class SubscriptionResource extends Resource
             ->actions([
                 Action::make('order')
                     ->label('Order')
-                    ->successRedirectUrl(route('filament.user.resources.list-available-products.index'))
-                    ->url(fn ($record): string => route('filament.user.resources.list-available-products.order', $record->uuid))
+                    ->url(fn ($record): string => route('filament.user.resources.subscriptions.order', $record->uuid))
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
