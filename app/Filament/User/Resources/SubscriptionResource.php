@@ -40,8 +40,6 @@ class SubscriptionResource extends Resource
 
     public static function table(Table $table): Table
     {
-        $user = Auth::user(); // Get the authenticated user
-        $userId = $user->id; // Assuming 'id' is the user ID field in your user model
         return $table
             // ->modifyQueryUsing(function (Builder $query) use ($userId) {
             //     $query->where('user_id', $userId);
@@ -57,9 +55,10 @@ class SubscriptionResource extends Resource
                 //
             ])
             ->actions([
-                Action::make('edit')
+                Action::make('order')
                     ->label('Order')
-                    ->url(fn ($record): string => route('filament.user.resources.subscriptions.order', $record->uuid))
+                    ->successRedirectUrl(route('filament.user.resources.list-available-products.index'))
+                    ->url(fn ($record): string => route('filament.user.resources.list-available-products.order', $record->uuid))
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

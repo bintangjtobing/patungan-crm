@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Builder;
 class Subscription extends Model
 {
     use HasFactory;
-    protected $tabe = 'products';
+    protected $tabel = 'products';
 }

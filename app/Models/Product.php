@@ -22,6 +22,7 @@ class Product extends Model
         'harga_beli',
         'type',
         'description',
+        'url_image',
     ];
 
     protected static function boot()

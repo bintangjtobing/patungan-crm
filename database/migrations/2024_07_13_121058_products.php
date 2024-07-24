@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('harga_jual')->require();
             $table->integer('harga_beli')->require();
             $table->string('type')->require();
+            $table->string('url_image')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
         });

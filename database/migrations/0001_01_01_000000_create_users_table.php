@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->boolean('type')->nullable();
             $table->string('no_hp')->unique()->nullable();
+            $table->boolean('is_active')->default(0);
             $table->string('profile_picture')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

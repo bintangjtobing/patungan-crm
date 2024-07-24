@@ -93,6 +93,7 @@ class UserResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('no_hp')
                     ->searchable(),
+                Tables\Columns\ToggleColumn::make('is_active'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal bergabung')
                     ->dateTime()

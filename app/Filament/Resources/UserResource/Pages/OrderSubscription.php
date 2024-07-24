@@ -4,6 +4,7 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
 use Filament\Resources\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
 
 class OrderSubscription extends Page
 {

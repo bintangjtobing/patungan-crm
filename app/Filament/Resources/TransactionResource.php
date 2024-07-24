@@ -184,19 +184,17 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make('harga')
                     ->money('IDR')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('status')
+                Tables\Columns\SelectColumn::make('status')
                     ->label('Status')
-                    ->formatStateUsing(function ($state) {
-                        return $state === 0 ? 'Pending' : ($state === 1 ? 'Selesai' : 'Batal');
-                    })
-                    ->searchable(),
+                    ->options([
+                        0 => 'Pending',
+                        1 => 'Selesai',
+                        2 => 'Batal',
+                    ]),
                 Tables\Columns\ImageColumn::make('bukti_transaksi')
                     ->defaultImageUrl(url('https://res.cloudinary.com/du0tz73ma/image/upload/v1700279273/building_z7thy7.png')),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                    ->label('Tanggal transaksi')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
