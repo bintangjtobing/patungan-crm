@@ -9,7 +9,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListSubscriptions extends ListRecords
 {
     protected static string $resource = SubscriptionResource::class;
-    protected static ?string $title = 'List available product';
+    protected static ?string $title = 'List subscriptions';
 
     protected function getHeaderActions(): array
     {

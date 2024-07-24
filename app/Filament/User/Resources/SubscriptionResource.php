@@ -25,7 +25,6 @@ class SubscriptionResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $title = 'List available product';
     protected static ?string $navigationLabel = 'Products';
-    protected static ?string $slug = 'list-available-products';
 
 
     public static function form(Form $form): Form
