@@ -16,6 +16,8 @@ return new class extends Migration
             $table->integer('user_id')->require();
             $table->string('type')->require();
             $table->string('status')->require();
+            $table->string('subject')->nullable();
+            $table->longText('body')->nullable();
             $table->datetime('tanggal_waktu_terkirim');
             $table->timestamps();
         });
