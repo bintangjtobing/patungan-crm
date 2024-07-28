@@ -71,64 +71,63 @@ class EmailResource extends Resource
             ])
             ->headerActions([
                 Action::make('sendEmail')
-                ->label('Send Email')
-                ->form([
-                    Select::make('user')
-                        ->label('Send to')
-                        ->searchable()
-                        ->options(
-                            User::all()->mapWithKeys(function ($user) {
-                                // Menggunakan username atau name sebagai fallback
-                                $label = $user->username ?? $user->name;
-                                return [$user->id => $label];
-                            })->toArray()
-                        )
-                        ->required(),
-                    Select::make('type')
-                        ->label('Type')
-                        ->options([
-                            'rimender' => 'Rimender',
-                            'welcome' => 'Welcome',
-                        ])
-                        ->required(),
-                    TextInput::make('subject')
-                        ->default('Pengingat Pembayaran Invoice #[Nomor Invoice]')
-                        ->required(),
-                    Hidden::make('nameApp')
-                        ->default('patunganYuk'),
-                    RichEditor::make('body')
-                        ->required(),
-                ])
-                ->action(function (array $data) {
-                    $user = User::find($data['user']);
-                    $email = Email::create([
-                        'user_id' => $user->id, // Menggunakan ID user
-                        'type' => $data['type'], // Mengambil type dari data
-                        'subject' => $data['subject'],
-                        'body' => $data['body'],
-                        'status' => 'pending',
-                        'tanggal_waktu_terkirim' => Carbon::now(),
-                    ]);
+                    ->label('Send Email')
+                    ->form([
+                        Select::make('user')
+                            ->label('Send to')
+                            ->searchable()
+                            ->options(
+                                User::where('type', 1)->get()->mapWithKeys(function ($user) {
+                                    $label = $user->username ?? $user->name;
+                                    return [$user->id => $label];
+                                })->toArray()
+                            )
+                            ->required(),
 
-                    try {
-                        Mail::to($user->email)
-                            ->send(new GenericEmail($data['subject'], $data['body'], $data['nameApp']));
+                        Select::make('type')
+                            ->label('Type')
+                            ->options([
+                                'rimender' => 'Rimender',
+                                'welcome' => 'Welcome',
+                            ])
+                            ->required(),
+                        TextInput::make('subject')
+                            ->required(),
+                        Hidden::make('nameApp')
+                            ->default('patunganYuk'),
+                        RichEditor::make('body')
+                            ->required(),
+                    ])
+                    ->action(function (array $data) {
+                        $user = User::find($data['user']);
+                        $email = Email::create([
+                            'user_id' => $user->id, // Menggunakan ID user
+                            'type' => $data['type'], // Mengambil type dari data
+                            'subject' => $data['subject'],
+                            'body' => $data['body'],
+                            'status' => 'pending',
+                            'tanggal_waktu_terkirim' => Carbon::now(),
+                        ]);
 
-                        $email->update(['status' => 'success', 'tanggal_waktu_terkirim' => Carbon::now()]);
+                        try {
+                            Mail::to($user->email)
+                                ->send(new GenericEmail($data['subject'], $data['body'], $data['nameApp']));
 
-                        Notification::make()
-                            ->title('Email sent successfully!')
-                            ->success()
-                            ->send();
-                    } catch (\Throwable $th) {
-                        $email->update(['status' => 'gagal']);
+                            $email->update(['status' => 'success', 'tanggal_waktu_terkirim' => Carbon::now()]);
 
-                        Notification::make()
-                            ->title('Failed to send email!')
-                            ->danger()
-                            ->send();
-                    }
-                }),
+                            Notification::make()
+                                ->title('Email sent successfully!')
+                                ->success()
+                                ->send();
+                        } catch (\Throwable $th) {
+                            $email->update(['status' => 'gagal']);
+
+                            Notification::make()
+                                ->title('Failed to send email!')
+                                ->danger()
+                                ->send();
+                        }
+                    }),
             ])
             ->filters([
                 //

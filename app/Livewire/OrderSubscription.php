@@ -119,7 +119,7 @@ class OrderSubscription extends Component implements HasForms
             'jenis_transaksi' => 1,
             'status' => 0,
             'jumlah' => $this->jumlah,
-            'harga_jual' => $this->harga_jual,
+            'harga' => $this->harga_jual,
             'bukti_transaksi' => $data['bukti_transaksi'] ?? null,
         ]);
         Notification::make()

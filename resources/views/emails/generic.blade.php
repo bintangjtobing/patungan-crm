@@ -46,7 +46,7 @@
             {!! $body !!}
         </div>
         <div class="email-footer">
-            &copy; {{ date('Y') }} Your Company. All rights reserved.
+            &copy; {{ date('Y') }} patunganYuk. All rights reserved.
         </div>
     </div>
 </body>

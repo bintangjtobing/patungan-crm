@@ -19,7 +19,7 @@ use Filament\Forms\Components\RichEditor;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\PaymentsResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Mail\GenericEmail; // Pastikan ini ditambahkan
+use App\Mail\GenericEmail;
 use App\Filament\Resources\PaymentsResource\RelationManagers;
 use Filament\Forms\Components\Hidden;
 
@@ -28,7 +28,6 @@ class PaymentsResource extends Resource
     protected static ?string $model = ListPayments::class;
     protected static ?string $navigationGroup = 'Transaction';
     protected static ?int $navigationSort = 2;
-    // protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
@@ -43,14 +42,14 @@ class PaymentsResource extends Resource
         $status = 0;
         $textBody = '<p>Halo [Nama Pelanggan],</p>
 
-                    <p>Kami harap Anda dalam keadaan baik</p>
+                    <p>Kami harap Anda dalam keadaan baik.</p>
 
-                    <p>Kami ingin mengingatkan Anda bahwa pembayaran untuk invoice #[Nomor Invoice] sebesar [Jumlah Pembayaran] jatuh tempo pada [Tanggal Jatuh Tempo]. Hingga saat ini, kami belum menerima pembayaran dari Anda.</p>
+                    <p>Kami ingin mengingatkan Anda bahwa pembayaran untuk [Nama Produk] sebesar [Jumlah Pembayaran] jatuh tempo pada [Tanggal Jatuh Tempo]. Hingga saat ini, kami belum menerima pembayaran dari Anda.</p>
 
                     <p>Detail pembayaran:</p>
 
                     <ul>
-                        <li>Nomor Invoice: #[Nomor Invoice]</li>
+                        <li>Nama Produk: [Nama Produk]</li>
                         <li>Jumlah Pembayaran: [Jumlah Pembayaran]</li>
                         <li>Tanggal Jatuh Tempo: [Tanggal Jatuh Tempo]</li>
                     </ul>
@@ -73,9 +72,6 @@ class PaymentsResource extends Resource
                             <td>[Nama Anda]</td>
                         </tr>
                         <tr>
-                            <td>[Posisi Anda]</td>
-                        </tr>
-                        <tr>
                             <td>[Nama Perusahaan]</td>
                         </tr>
                         <tr>
@@ -86,6 +82,7 @@ class PaymentsResource extends Resource
                         </tr>
                     </table>
                     ';
+
         return $table
             ->modifyQueryUsing(function (Builder $query) use ($status) {
                 return $query->where('status', $status)
@@ -117,6 +114,11 @@ class PaymentsResource extends Resource
                         1 => 'Selesai',
                         2 => 'Batal',
                     ]),
+                Tables\Columns\TextColumn::make('modified_transaction_date')
+                    ->label('Langganan Berakhir')
+                    ->getStateUsing(function ($record) {
+                        return $record->modified_transaction_date;
+                    }),
                 Tables\Columns\ImageColumn::make('bukti_transaksi')
                     ->defaultImageUrl(url('https://res.cloudinary.com/du0tz73ma/image/upload/v1700279273/building_z7thy7.png')),
                 Tables\Columns\TextColumn::make('created_at')
@@ -131,16 +133,39 @@ class PaymentsResource extends Resource
             ->actions([
                 Action::make('sendEmail')
                     ->label('Kirim pengingat')
-                    ->form([
-                        TextInput::make('subject')->default('Pengingat Pembayaran Invoice #[Nomor Invoice]')->required(),
+                    ->form(fn (ListPayments $record) => [
+                        TextInput::make('subject')
+                            ->default('Pengingat Pembayaran produk ' . $record->product->nama)
+                            ->required(),
                         Hidden::make('nameApp')->default('patunganYuk'),
-                        RichEditor::make('body')->default($textBody)->required(),
+                        RichEditor::make('body')
+                            ->default(
+                                str_replace(
+                                    ['[Nama Pelanggan]', '[Nama Produk]', '[Jumlah Pembayaran]', '[Tanggal Jatuh Tempo]', '[Metode Pembayaran]', '[Nama Bank]', '[Nomor Rekening]', '[Nama Pemilik Rekening]', '[Nomor Telepon]', '[Nama Anda]', '[Nama Perusahaan]', '[Email]'],
+                                    [
+                                        $record->user->name,
+                                        $record->product->nama,
+                                        $record->product->harga_jual,
+                                        $record->modified_transaction_date,
+                                        'Transfer Bank',
+                                        'BCA',
+                                        '1234567890',
+                                        'Bintang Tobing',
+                                        '081234567890',
+                                        'Bintang Tobing',
+                                        'PatunganYuk',
+                                        'patunganYuk@gmail.com',
+                                    ],
+                                    $textBody
+                                )
+                            )
+                            ->required(),
                     ])
                     ->action(function (array $data, ListPayments $record) {
 
                         $email = Email::create([
                             'user_id' => $record->user->id,
-                            'type' => 'rimender',
+                            'type' => 'reminder',
                             'subject' => $data['subject'],
                             'body' => $data['body'],
                             'status' => 'pending',
@@ -183,7 +208,7 @@ class PaymentsResource extends Resource
 
     public static function canCreate(): bool
     {
-       return false;
+        return false;
     }
 
     public static function getPages(): array
