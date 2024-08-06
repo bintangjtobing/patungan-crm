@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Models\Product;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
@@ -20,12 +21,11 @@ use Filament\Tables\Actions\Action;
 
 class SubscriptionResource extends Resource
 {
-    protected static ?string $model = Product::class;
+    protected static ?string $model = Transaction::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $title = 'List available product';
-    protected static ?string $navigationLabel = 'Products';
-
+    protected static ?string $navigationLabel = 'Subscription';
 
     public static function form(Form $form): Form
     {
@@ -40,23 +40,25 @@ class SubscriptionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            // ->modifyQueryUsing(function (Builder $query) use ($userId) {
-            //     $query->where('user_id', $userId);
-            // })
             ->columns([
-                Tables\Columns\TextColumn::make('nama')
+                Tables\Columns\TextColumn::make('product.nama')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('harga_jual')
+                Tables\Columns\TextColumn::make('harga')
                     ->money('IDR')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('modified_transaction_date')
+                    ->label('Langganan Berakhir')
+                    ->getStateUsing(function ($record) {
+                        return $record->modified_transaction_date;
+                    })
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Action::make('order')
-                    ->label('Order')
-                    ->url(fn ($record): string => route('filament.user.resources.subscriptions.order', $record->uuid))
+                    ->label('Perpanjang')
+                    ->url(fn ($record): string => route('filament.user.resources.subscriptions.order', ['record' => $record->id]))
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -77,7 +79,7 @@ class SubscriptionResource extends Resource
         return [
             'index' => Pages\ListSubscriptions::route('/'),
             'create' => Pages\CreateSubscription::route('/create'),
-            'edit' => Pages\EditSubscription::route('/{record}/edit'),
+            // 'edit' => Pages\EditSubscription::route('/{record}/edit'),
             'order' => Pages\OrderSubscription::route('/{record}/order')
         ];
     }

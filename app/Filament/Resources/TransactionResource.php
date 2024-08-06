@@ -168,6 +168,9 @@ class TransactionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function (Builder $query){
+                return $query->orderBy("created_at", 'desc');
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('jenis_transaksi')
                     ->label('Jenis Transaksi')

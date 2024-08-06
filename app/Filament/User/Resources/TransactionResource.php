@@ -2,18 +2,19 @@
 
 namespace App\Filament\User\Resources;
 
-use App\Filament\User\Resources\TransactionResource\Pages;
-use App\Filament\User\Resources\TransactionResource\RelationManagers;
-use App\Models\Transaction;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\Transaction;
+use Illuminate\Support\Carbon;
+use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Carbon;
+use App\Filament\User\Resources\TransactionResource\Pages;
+use App\Filament\User\Resources\TransactionResource\RelationManagers;
 
 class TransactionResource extends Resource
 {
@@ -37,7 +38,8 @@ class TransactionResource extends Resource
         $userId = $user->id; // Assuming 'id' is the user ID field in your
         return $table
             ->modifyQueryUsing(function (Builder $query) use ($userId) {
-                $query->where('user_id', $userId);
+                $query->where('user_id', $userId)
+                    ->orderBy('created_at', 'desc'); // or any other column you want to sort by
             })
             ->columns([
                 Tables\Columns\TextColumn::make('product.nama')
@@ -53,11 +55,14 @@ class TransactionResource extends Resource
                     ->label('Langganan Berakhir')
                     ->getStateUsing(function ($record) {
                         return $record->modified_transaction_date;
-                    })
-                    ->searchable(),
+                    }),
             ])
             ->filters([
                 //
+            ])
+            ->actions([
+                Action::make('unduh')
+                    ->url(fn ($record): string => route('pdf.dwonload', ['id' => $record->id])),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
@@ -78,7 +83,7 @@ class TransactionResource extends Resource
         return [
             'index' => Pages\ListTransactions::route('/'),
             'create' => Pages\CreateTransaction::route('/create'),
-            'edit' => Pages\EditTransaction::route('/{record}/edit'),
+            // 'edit' => Pages\EditTransaction::route('/{record}/edit'),
         ];
     }
 }

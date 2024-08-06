@@ -22,6 +22,8 @@
             text-align: center;
             padding-bottom: 20px;
             border-bottom: 1px solid #dddddd;
+            display: flex;
+            justify-items: center;
         }
         .email-body {
             padding: 20px 0;
@@ -33,11 +35,16 @@
             font-size: 12px;
             color: #888888;
         }
+        .logo {
+            height: 80px;
+        }
     </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
     <div class="email-container">
         <div class="email-header">
+            <img class="logo" src="https://res.cloudinary.com/boxity-id/image/upload/v1720974567/2_copy_z3a91z.png" alt="">
             <h1>{{ $nameApp }}</h1>
         </div>
         <div class="email-body">

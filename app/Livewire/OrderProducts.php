@@ -1,44 +1,34 @@
 <?php
+
 namespace App\Livewire;
 
-use App\Models\Product;
-use App\Models\Transaction;
 use Livewire\Component;
+use App\Models\Transaction;
+use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Form;
 use Filament\Forms\Components\Grid;
-use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Auth;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\BaseFileUpload;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Concerns\InteractsWithForms;
-use League\Flysystem\UnableToCheckFileExistence;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\Model;
 
-class OrderSubscription extends Component implements HasForms
+class OrderProducts extends Component implements HasForms
 {
     use InteractsWithForms;
 
     public $data = [];
-    public Transaction $transaction;
-    public $jumlah = 1;
+    public Product $product;
+    public $jumlah = 0;
     public $harga_jual;
 
-    public function mount(Transaction $transaction): void
+    public function mount(Product $product): void
     {
-        $transaction->load('product');
-        $this->product = $transaction->product;
-
-        if (!$this->product) {
-            dd("Product relation is null", $transaction->toArray());
-        }
-        // $this->product = Product::where('uuid', $record)->firstOrFail();
-        // $this->harga_jual = $this->product->harga_jual;
+        $this->product = $product;
 
         $this->form->fill([
             'nama' => $this->product->nama,
@@ -67,7 +57,7 @@ class OrderSubscription extends Component implements HasForms
             'user_id' => Auth::user()->id,
             'jenis_transaksi' => 1,
             'status' => 0,
-            'bukti_transaksi' => null
+            'bukti_transaksi' => $this->data['bukti_transaksi'] ?? null
         ]);
     }
 
@@ -89,22 +79,23 @@ class OrderSubscription extends Component implements HasForms
                     TextInput::make('harga_jual')
                         ->label('Harga')
                         ->default($this->harga_jual)
-                        ->reactive()
                         ->extraInputAttributes(['readonly' => true]),
                     FileUpload::make('bukti_transaksi')
                         ->image()
-                        ->saveUploadedFileUsing(function (BaseFileUpload $component, TemporaryUploadedFile $file): ?string {
-                            try {
-                                if (!$file->exists()) {
+                        ->saveUploadedFileUsing(function (TemporaryUploadedFile $file): ?string {
+                            if ($file->exists()) {
+                                try {
+                                    // Ensure we return a string path from Cloudinary
+                                    return Cloudinary::upload($file->getRealPath())->getSecurePath();
+                                } catch (\Exception $e) {
+                                    // Handle upload exceptions
                                     return null;
                                 }
-                            } catch (UnableToCheckFileExistence $exception) {
-                                return null;
                             }
-
-                            return Cloudinary::upload($file->getRealPath())->getSecurePath();
+                            return null;
                         })
-                        ->reactive(),
+                        ->reactive()
+                        ->afterStateUpdated(fn($state) => $this->data['bukti_transaksi'] = $state),
                 ]),
                 Hidden::make('user_id')
                     ->default(Auth::user()->id),
@@ -118,29 +109,37 @@ class OrderSubscription extends Component implements HasForms
 
     public function submit(): void
     {
-        Transaction::create([
-            'product_uuid' => $this->product->uuid,
-            'user_id' => Auth::user()->id,
-            'jenis_transaksi' => 1,
-            'status' => 0,
-            'jumlah' => $this->jumlah,
-            'harga' => $this->harga_jual,
-            'bukti_transaksi' => $this->data['bukti_transaksi'] ?? null,
-        ]);
+        try {
+            // Ensure bukti_transaksi is properly set
+            $buktiTransaksi = is_array($this->data['bukti_transaksi']) ? null : $this->data['bukti_transaksi'];
 
-        Notification::make()
-            ->title('Order berhasil')
-            ->success()
-            ->send();
+            Transaction::create([
+                'product_uuid' => $this->product->uuid,
+                'user_id' => Auth::user()->id,
+                'jenis_transaksi' => $this->data['jenis_transaksi'],
+                'status' => $this->data['status'],
+                'jumlah' => $this->data['jumlah'],
+                'harga' => $this->data['harga_jual'],
+                'bukti_transaksi' => $buktiTransaksi,
+            ]);
 
-        redirect(route('filament.user.resources.transactions.index'));
+            Notification::make()
+                ->title('Order berhasil')
+                ->success()
+                ->send();
+
+            redirect(route('filament.user.resources.products.index'));
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('Order gagal')
+                ->danger()
+                ->body($e->getMessage())
+                ->send();
+        }
     }
 
-    public function render(): View
+    public function render()
     {
-        return view('livewire.orderSubscription', [
-            'data' => $this->data,
-            'product' => $this->product,
-        ]);
+        return view('livewire.order-products');
     }
 }

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,7 +26,6 @@ class Transaction extends Model
     {
         parent::boot();
 
-        // Event creating untuk mengatur nilai default tanggal_waktu_transaksi_selesai
         static::creating(function ($transaction) {
             if (is_null($transaction->tanggal_waktu_transaksi_selesai)) {
                 $transaction->tanggal_waktu_transaksi_selesai = Carbon::now()->setTimezone('Asia/Jakarta');

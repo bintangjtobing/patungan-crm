@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,8 +11,8 @@ class Product extends Model
     use HasFactory;
 
     protected $primaryKey = 'uuid';
-    protected $keyType = 'string'; // Tentukan tipe kunci sebagai string jika menggunakan UUID
-    public $incrementing = false; // Pastikan bahwa tidak ada peningkatan secara otomatis untuk UUID
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
         'uuid',

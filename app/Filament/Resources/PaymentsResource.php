@@ -9,6 +9,7 @@ use App\Models\Email;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\ListPayments;
+use App\Models\Rekening; // Tambahkan ini
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
@@ -40,48 +41,6 @@ class PaymentsResource extends Resource
     public static function table(Table $table): Table
     {
         $status = 0;
-        $textBody = '<p>Halo [Nama Pelanggan],</p>
-
-                    <p>Kami harap Anda dalam keadaan baik.</p>
-
-                    <p>Kami ingin mengingatkan Anda bahwa pembayaran untuk [Nama Produk] sebesar [Jumlah Pembayaran] jatuh tempo pada [Tanggal Jatuh Tempo]. Hingga saat ini, kami belum menerima pembayaran dari Anda.</p>
-
-                    <p>Detail pembayaran:</p>
-
-                    <ul>
-                        <li>Nama Produk: [Nama Produk]</li>
-                        <li>Jumlah Pembayaran: [Jumlah Pembayaran]</li>
-                        <li>Tanggal Jatuh Tempo: [Tanggal Jatuh Tempo]</li>
-                    </ul>
-                    <p>Anda dapat melakukan pembayaran melalui [Metode Pembayaran] ke rekening berikut:</p>
-
-                    <ul>
-                        <li>Bank: [Nama Bank]</li>
-                        <li>Nomor Rekening: [Nomor Rekening]</li>
-                        <li>Atas Nama: [Nama Pemilik Rekening]</li>
-                    </ul>
-
-                    <p>Jika Anda telah melakukan pembayaran, abaikan email ini dan kami mohon maaf atas ketidaknyamanannya. Jika ada pertanyaan atau membutuhkan bantuan lebih lanjut, jangan ragu untuk menghubungi kami di [Nomor Telepon] atau balas email ini.</p>
-
-                    <p>Terima kasih atas perhatian dan kerjasamanya.</p>
-
-                    <p>Salam hangat,</p>
-
-                   <table>
-                        <tr>
-                            <td>[Nama Anda]</td>
-                        </tr>
-                        <tr>
-                            <td>[Nama Perusahaan]</td>
-                        </tr>
-                        <tr>
-                            <td>[Nomor Telepon]</td>
-                        </tr>
-                        <tr>
-                            <td>[Email]</td>
-                        </tr>
-                    </table>
-                    ';
 
         return $table
             ->modifyQueryUsing(function (Builder $query) use ($status) {
@@ -133,36 +92,82 @@ class PaymentsResource extends Resource
             ->actions([
                 Action::make('sendEmail')
                     ->label('Kirim pengingat')
-                    ->form(fn (ListPayments $record) => [
-                        TextInput::make('subject')
-                            ->default('Pengingat Pembayaran produk ' . $record->product->nama)
-                            ->required(),
-                        Hidden::make('nameApp')->default('patunganYuk'),
-                        RichEditor::make('body')
-                            ->default(
-                                str_replace(
-                                    ['[Nama Pelanggan]', '[Nama Produk]', '[Jumlah Pembayaran]', '[Tanggal Jatuh Tempo]', '[Metode Pembayaran]', '[Nama Bank]', '[Nomor Rekening]', '[Nama Pemilik Rekening]', '[Nomor Telepon]', '[Nama Anda]', '[Nama Perusahaan]', '[Email]'],
-                                    [
-                                        $record->user->name,
-                                        $record->product->nama,
-                                        $record->product->harga_jual,
-                                        $record->modified_transaction_date,
-                                        'Transfer Bank',
-                                        'BCA',
-                                        '1234567890',
-                                        'Bintang Tobing',
-                                        '081234567890',
-                                        'Bintang Tobing',
-                                        'PatunganYuk',
-                                        'patunganYuk@gmail.com',
-                                    ],
-                                    $textBody
-                                )
-                            )
-                            ->required(),
-                    ])
-                    ->action(function (array $data, ListPayments $record) {
+                    ->form(function (ListPayments $record) {
+                        $rekening = Rekening::where('is_active', 1)->first(); // Dapatkan data rekening pertama, atau bisa dimodifikasi sesuai kebutuhan
 
+                        $textBody = '<p>Halo [Nama Pelanggan],</p>
+
+                            <p>Kami harap Anda dalam keadaan baik.</p>
+
+                            <p>Kami ingin mengingatkan Anda bahwa pembayaran untuk [Nama Produk] sebesar [Jumlah Pembayaran] jatuh tempo pada [Tanggal Jatuh Tempo]. Hingga saat ini, kami belum menerima pembayaran dari Anda.</p>
+
+                            <p>Detail pembayaran:</p>
+
+                            <ul>
+                                <li>Nama Produk: [Nama Produk]</li>
+                                <li>Jumlah Pembayaran: [Jumlah Pembayaran]</li>
+                                <li>Tanggal Jatuh Tempo: [Tanggal Jatuh Tempo]</li>
+                            </ul>
+                            <p>Anda dapat melakukan pembayaran melalui [Metode Pembayaran] ke rekening berikut:</p>
+
+                            <ul>
+                                <li>Bank: [Nama Bank]</li>
+                                <li>Nomor Rekening: [Nomor Rekening]</li>
+                                <li>Atas Nama: [Nama Pemilik Rekening]</li>
+                            </ul>
+
+                            <p>Jika Anda telah melakukan pembayaran, abaikan email ini dan kami mohon maaf atas ketidaknyamanannya. Jika ada pertanyaan atau membutuhkan bantuan lebih lanjut, jangan ragu untuk menghubungi kami di [Nomor Telepon] atau balas email ini.</p>
+
+                            <p>Terima kasih atas perhatian dan kerjasamanya.</p>
+
+                            <p>Salam hangat,</p>
+
+                            <table>
+                                <tr>
+                                    <td>[Nama Anda]</td>
+                                </tr>
+                                <tr>
+                                    <td>[Nama Perusahaan]</td>
+                                </tr>
+                                <tr>
+                                    <td>[Nomor Telepon]</td>
+                                </tr>
+                                <tr>
+                                    <td>[Email]</td>
+                                </tr>
+                            </table>
+                        ';
+
+                        return [
+                            TextInput::make('subject')
+                                ->default('Pengingat Pembayaran produk ' . $record->product->nama)
+                                ->required(),
+                            Hidden::make('nameApp')->default('patunganYuk'),
+                            RichEditor::make('body')
+                                ->default(
+                                    str_replace(
+                                        ['[Nama Pelanggan]', '[Nama Produk]', '[Jumlah Pembayaran]', '[Tanggal Jatuh Tempo]', '[Metode Pembayaran]', '[Nama Bank]', '[Nomor Rekening]', '[Nama Pemilik Rekening]', '[Nomor Telepon]', '[Nama Anda]', '[Nama Perusahaan]', '[Email]'],
+                                        [
+                                            $record->user->name,
+                                            $record->product->nama,
+                                            $record->product->harga_jual,
+                                            $record->modified_transaction_date,
+                                            'Transfer Bank',
+                                            $rekening->bank ?? 'Bank Tidak Diketahui', // Nama Bank dari model Rekening
+                                            $rekening->no_rek ?? 'Nomor Rekening Tidak Diketahui', // Nomor Rekening dari model Rekening
+                                            $rekening->name ?? 'Nama Pemilik Tidak Diketahui', // Nama Pemilik Rekening dari model Rekening
+                                            '081234567890',
+                                            'Bintang Tobing',
+                                            'PatunganYuk',
+                                            'patunganYuk@gmail.com',
+                                        ],
+                                        $textBody
+                                    )
+                                )
+                                ->required(),
+                        ];
+                    })
+                    ->action(function (array $data, ListPayments $record) {
                         $email = Email::create([
                             'user_id' => $record->user->id,
                             'type' => 'reminder',
