@@ -30,7 +30,7 @@ class OrderSubscription extends Component implements HasForms
     public $jumlah = 1;
     public $harga_jual;
 
-    public function mount(Product $product): void
+    public function mount(Transaction $transaction): void
     {
         $this->product = $product;
         $this->harga_jual = $this->product->harga_jual;
