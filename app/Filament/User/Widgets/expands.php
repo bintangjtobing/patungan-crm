@@ -8,12 +8,18 @@ use Illuminate\Support\Carbon;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 
-class expands extends BaseWidget
+class Expands extends BaseWidget
 {
+    public function getColumnSpan(): int|string|array
+    {
+        return 2;
+    }
+
     protected function getStats(): array
     {
         return [
-            Stat::make('Outcom', function () {
+
+            Stat::make('Outcome', function () {
                 $currentMonth = Carbon::now()->month;
                 $currentYear = Carbon::now()->year;
 

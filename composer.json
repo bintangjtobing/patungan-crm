@@ -9,6 +9,7 @@
         "barryvdh/laravel-dompdf": "^2.2",
         "cloudinary-labs/cloudinary-laravel": "^2.0",
         "filament/filament": "^3.2",
+        "koalafacade/filament-alertbox": "^1.0",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
         "leandrocfe/filament-apex-charts": "^3.1",

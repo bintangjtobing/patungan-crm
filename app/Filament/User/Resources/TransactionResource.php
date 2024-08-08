@@ -39,6 +39,7 @@ class TransactionResource extends Resource
         return $table
             ->modifyQueryUsing(function (Builder $query) use ($userId) {
                 $query->where('user_id', $userId)
+                    ->where("status", 1)
                     ->orderBy('created_at', 'desc'); // or any other column you want to sort by
             })
             ->columns([

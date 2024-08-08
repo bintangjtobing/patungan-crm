@@ -40,12 +40,22 @@ class SubscriptionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function(Builder $query) {
+                $query->where('user_id', Auth::user()->id)
+                ->where('status' , 1)
+                ->whereIn('id', function ($subQuery) {
+                    $subQuery->selectRaw('MAX(id)')
+                        ->from('transactions')
+                        ->groupBy('product_uuid');
+                });
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('product.nama')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('harga')
                     ->money('IDR')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('status'),
                 Tables\Columns\TextColumn::make('modified_transaction_date')
                     ->label('Langganan Berakhir')
                     ->getStateUsing(function ($record) {
