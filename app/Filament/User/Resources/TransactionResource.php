@@ -52,6 +52,8 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make('tanggal_waktu_transaksi_selesai')
                     ->label('Tanggal Pesanan')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('status'),
                 Tables\Columns\TextColumn::make('modified_transaction_date')
                     ->label('Langganan Berakhir')
                     ->getStateUsing(function ($record) {
@@ -63,7 +65,7 @@ class TransactionResource extends Resource
             ])
             ->actions([
                 Action::make('unduh')
-                    ->url(fn ($record): string => route('pdf.dwonload', ['id' => $record->id])),
+                    ->url(fn($record): string => route('pdf.dwonload', ['id' => $record->id])),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([

@@ -2,20 +2,24 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Forms\Form;
-use Filament\Pages\Auth\Register;
-use Filament\Forms\Components\Wizard;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\FileUpload;
-use Illuminate\Support\HtmlString;
 use App\Models\Product;
+use Filament\Forms\Form;
 use App\Models\Transaction;
+use Filament\Pages\Auth\Register;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Filament\Notifications\Auth\VerifyEmail;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Wizard;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
+use Filament\Notifications\Auth\VerifyEmail;
+use Filament\Forms\Components\BaseFileUpload;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use League\Flysystem\UnableToCheckFileExistence;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class Registration extends Register
 {
@@ -74,17 +78,20 @@ class Registration extends Register
 
             $this->form->model($user)->saveRelationships();
 
-            // Menambahkan data ke tabel Transaction
-            $transaction = Transaction::create([
+            // Add transaction data
+            Transaction::create([
                 'user_id' => $user->id,
                 'product_uuid' => $data['product_uuid'],
                 'harga' => $data['harga'],
                 'bukti_transaksi' => $data['bukti_transaksi'],
-                'status' => 0, // atau status default lainnya
-                'jenis_transaksi' => 1, // atau jenis transaksi yang sesuai
+                'status' => 0,
+                'jenis_transaksi' => 1,
             ]);
 
             $this->callHook('afterRegister');
+
+            // Send the registration success notification
+            $user->notify(new \App\Notifications\UserRegisteredNotification($user));
 
             return $user;
         });
@@ -168,7 +175,19 @@ class Registration extends Register
     protected function getFileUploadFormComponent(): Component
     {
         return FileUpload::make('bukti_transaksi')
+            ->image()
             ->label('Bukti Transaksi')
-            ->required();
+            ->saveUploadedFileUsing(function (BaseFileUpload $component, TemporaryUploadedFile $file): ?string {
+                try {
+                    if (!$file->exists()) {
+                        return null;
+                    }
+                } catch (UnableToCheckFileExistence $exception) {
+                    return null;
+                }
+
+                return Cloudinary::upload($file->getRealPath())->getSecurePath();
+            })
+            ->reactive();
     }
 }

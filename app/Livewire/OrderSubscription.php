@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire;
 
 use App\Models\Product;
@@ -18,7 +19,6 @@ use League\Flysystem\UnableToCheckFileExistence;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Filament\Notifications\Notification;
-use Illuminate\Database\Eloquent\Model;
 
 class OrderSubscription extends Component implements HasForms
 {
@@ -26,29 +26,30 @@ class OrderSubscription extends Component implements HasForms
 
     public $data = [];
     public Transaction $transaction;
+    public Product $product;
     public $jumlah = 1;
     public $harga_jual;
 
     public function mount(Transaction $transaction): void
     {
-        $transaction->load('product');
+        // Set transaction dan product
+        $this->transaction = $transaction;
         $this->product = $transaction->product;
 
-        if (!$this->product) {
-            dd("Product relation is null", $transaction->toArray());
-        }
-        // $this->product = Product::where('uuid', $record)->firstOrFail();
-        // $this->harga_jual = $this->product->harga_jual;
+        // Pastikan product ada
+        if ($this->product) {
+            $this->harga_jual = $this->product->harga_jual;
 
-        $this->form->fill([
-            'nama' => $this->product->nama,
-            'harga_jual' => $this->harga_jual,
-            'jumlah' => $this->jumlah,
-            'user_id' => Auth::user()->id,
-            'jenis_transaksi' => 1,
-            'status' => 0,
-            'bukti_transaksi' => null
-        ]);
+            $this->form->fill([
+                'nama' => $this->product->nama,
+                'harga_jual' => $this->harga_jual,
+                'jumlah' => $this->jumlah,
+                'user_id' => Auth::user()->id,
+                'jenis_transaksi' => 1,
+                'status' => 0,
+                'bukti_transaksi' => null
+            ]);
+        }
     }
 
     public function updatedJumlah($value)

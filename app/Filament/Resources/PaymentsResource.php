@@ -56,9 +56,11 @@ class PaymentsResource extends Resource
                             : '<span style="color: green;">Penjualan</span>';
                     })
                     ->html(),
-                Tables\Columns\TextColumn::make('user.username')
+                    Tables\Columns\TextColumn::make('user.username')
                     ->label('User')
-                    ->getStateUsing(fn ($record) => $record->user->username ? $record->user->username : $record->user->name),
+                    ->getStateUsing(function ($record) {
+                        return $record->user ? ($record->user->username ?? $record->user->name) : '-';
+                    }),
                 Tables\Columns\TextColumn::make('product.nama')->label('Product'),
                 Tables\Columns\TextColumn::make('jumlah')
                     ->numeric()

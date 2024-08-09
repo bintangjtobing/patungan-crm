@@ -24,7 +24,7 @@ class SubscriptionResource extends Resource
     protected static ?string $model = Transaction::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $title = 'List available product';
+    // protected static ?string $title = 'List available product';
     protected static ?string $navigationLabel = 'Subscription';
 
     public static function form(Form $form): Form
@@ -42,9 +42,9 @@ class SubscriptionResource extends Resource
         return $table
             ->modifyQueryUsing(function(Builder $query) {
                 $query->where('user_id', Auth::user()->id)
-                ->where('status' , 1)
+                ->where('status', 1)
                 ->whereIn('id', function ($subQuery) {
-                    $subQuery->selectRaw('MAX(id)')
+                    $subQuery->select('id')
                         ->from('transactions')
                         ->groupBy('product_uuid');
                 });

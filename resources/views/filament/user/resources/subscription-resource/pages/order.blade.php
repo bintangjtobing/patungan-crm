@@ -1,3 +1,3 @@
 <x-filament::page>
-    @livewire('orderSubscription', ['product' => $record])
+    @livewire('orderSubscription', ['transaction' => $record])
 </x-filament::page>

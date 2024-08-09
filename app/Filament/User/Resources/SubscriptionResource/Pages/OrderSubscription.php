@@ -24,7 +24,7 @@ class OrderSubscription extends EditRecord
     }
     public function getTitle(): string|Htmlable
     {
-        return 'Order title';
+        return 'Order produk';
     }
 
 }

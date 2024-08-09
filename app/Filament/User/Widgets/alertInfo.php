@@ -10,7 +10,7 @@ use KoalaFacade\FilamentAlertBox\Widgets\AlertBoxWidget;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 
-class alertInfo extends AlertBoxWidget
+class AlertInfo extends AlertBoxWidget
 {
     protected ?string $productName = null;
     protected ?int $transactionId = null; // Add a property to store the transaction ID
@@ -22,15 +22,17 @@ class alertInfo extends AlertBoxWidget
 
     public string $type = 'warning';
 
-    public Closure|string|Htmlable|null $label = 'Oops!';
+    public Closure|string|Htmlable|null $label = 'Informasi pembayaran';
 
     public string|Closure|Htmlable|null $helperText = null;
 
     public function mount(): void
     {
         $transaction = $this->getLatestTransaction();
-        $this->productName = $transaction ? $transaction->product->nama : 'Produk';
-        $this->transactionId = $transaction ? $transaction->id : null; // Store the transaction ID
+        if ($transaction) {
+            $this->productName = $transaction->product->nama;
+            $this->transactionId = $transaction->id; // Store the transaction ID
+        }
     }
 
     protected function getLatestTransaction(): ?Transaction
@@ -43,6 +45,10 @@ class alertInfo extends AlertBoxWidget
 
     public function getHelperText(): string|Htmlable|null
     {
+        if (!$this->productName || !$this->transactionId) {
+            return 'Anda tidak memiliki tunggakan pembayaran apapun'; // Ensure no helper text is returned if conditions are not met
+        }
+
         return $this->helperText ?? $this->generateHelperTextWithButton();
     }
 
